@@ -5,7 +5,7 @@
 # Copyright (c) 2000-2002 Fabrice Bellard
 # Copyright (c) 2005-2008 Diego Biurrun
 # Copyright (c) 2005-2008 Mans Rullgard
-#
+
 
 # Set PKG_CONFIG_PATH manually
 export PKG_CONFIG_PATH=$PWD/build/lib/pkgconfig
