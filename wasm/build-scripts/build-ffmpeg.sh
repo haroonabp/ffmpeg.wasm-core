@@ -5,6 +5,7 @@ source $(dirname $0)/var.sh
 
 if [[ "$FFMPEG_ST" != "yes" ]]; then
   mkdir -p wasm/packages/core/dist
+  EXPORTED_FUNCTIONS="[_main, _proxy_main]"
   EXTRA_FLAGS=(
     -pthread
     -s USE_PTHREADS=1                             # enable pthreads support
@@ -13,6 +14,7 @@ if [[ "$FFMPEG_ST" != "yes" ]]; then
   )
 else
   mkdir -p wasm/packages/core-st/dist
+  EXPORTED_FUNCTIONS="[_main]"
   EXTRA_FLAGS=(
     -o wasm/packages/core-st/dist/ffmpeg-core.js
   )
@@ -28,12 +30,14 @@ FLAGS=(
   -s EXIT_RUNTIME=1                             # exit runtime after execution
   -s MODULARIZE=1                               # use modularized version to be more flexible
   -s EXPORT_NAME="createFFmpegCore"             # assign export name for browser
-  -s EXPORTED_FUNCTIONS="[_main]"  # export main and proxy_main funcs
-  -s EXPORTED_RUNTIME_METHODS="[FS, cwrap, ccall, setValue, writeAsciiToMemory]"   # export preamble funcs
-  -s INITIAL_MEMORY=67108864                  # 64 KB * 1024 * 16 * 2047 = 2146435072 bytes ~= 2 GB
+  -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS"  # export main and proxy_main funcs
+  -s EXTRA_EXPORTED_RUNTIME_METHODS="[FS, cwrap, ccall, setValue, writeAsciiToMemory]"   # export preamble funcs
+  -s INITIAL_MEMORY=33554432                    # 32MB
+  -s MAXIMUM_MEMORY=1073741824                  # 1GB
+  -s ALLOW_MEMORY_GROWTH=1
 #   -s WASM=0
-  --pre-js wasm/src/pre.js
   --post-js wasm/src/post.js
+  --pre-js wasm/src/pre.js
   $OPTIM_FLAGS
   ${EXTRA_FLAGS[@]}
 )
